@@ -1,0 +1,12 @@
+[submodule "libs/curl"]
+	path = libs/curl
+	url = https://github.com/curl/curl.git
+[submodule "libs/inih"]
+	path = libs/inih
+	url = https://github.com/benhoyt/inih.git
+[submodule "libs/json"]
+	path = libs/json
+	url = https://github.com/nlohmann/json.git
+[submodule "libs/catch"]
+	path = libs/catch
+	url = https://github.com/catchorg/Catch2.git
