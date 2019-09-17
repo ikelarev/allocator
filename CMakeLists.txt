@@ -55,7 +55,7 @@ set_target_properties(uninstall PROPERTIES FOLDER ${CMAKE_FOLDER})
 
 # GLPK
 set(CMAKE_FOLDER "GLPK")
-file(GLOB GLPK_DIR "${THIRD_PARTY_DIR}/glpk-*")
+set(GLPK_DIR "${THIRD_PARTY_DIR}/glpk")
 set(GLPK_SRC_DIR "${GLPK_DIR}/src")
 
 MACRO(SUBDIRLIST result curdir)
