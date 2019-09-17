@@ -34,7 +34,7 @@
 #include <memory>
 #include <sstream>
 
-#define VERSION "2.0"
+#define VERSION "2.01"
 
 int main(int argc, char* argv[])
 {
@@ -146,8 +146,7 @@ int main(int argc, char* argv[])
     std::cout << "  " << ticker << "\t" << name << std::endl;
   }
 
-  bool haveAllAsks = true;
-  double average = 0;
+  double avgRelativeSpread = 0;
   size_t count = 0;
   for (size_t i = 0; i < a.GetCount(); i++)
   {
@@ -156,39 +155,36 @@ int main(int argc, char* argv[])
     double bid, ask;
     if (provider->GetAssetPrice(ticker, MarketInfoProvider::bid, bid) &&
       provider->GetAssetPrice(ticker, MarketInfoProvider::ask, ask) &&
-      bid > 0 && ask >= bid)
+      bid > 0 && ask > bid)
     {
-      average += (ask - bid) / bid;
+      avgRelativeSpread += (ask - bid) / bid;
       count++;
     }
-
-    haveAllAsks = haveAllAsks && provider->GetAssetPrice(ticker, MarketInfoProvider::ask, ask);
   }
+
   if (count > 0)
   {
-    average /= count;
+    avgRelativeSpread /= count;
   }
   else
   {
-    average = 0.0005; // TODO: configure?
+    avgRelativeSpread = 0.05 / 100; // TODO: configure?
   }
 
-  auto f = [&](const std::string &ticker, double &bid, double &ask)
+  bool haveAllAsks = true;
+  auto ratesProvider = [&provider, avgRelativeSpread, &haveAllAsks](const std::string &ticker, double &bid, double &ask)
   {
     if (!provider->GetAssetPrice(ticker, MarketInfoProvider::bid, bid))
     {
       bool ok = provider->GetAssetPrice(ticker, MarketInfoProvider::last, bid);
-      assert(ok);
+      assert(ok); // Each ticker should have last price
     }
 
-    if (!provider->GetAssetPrice(ticker, MarketInfoProvider::ask, ask))
+    bool ok = provider->GetAssetPrice(ticker, MarketInfoProvider::ask, ask);
+    if (!ok || ask <= bid)
     {
-      if (!provider->GetAssetPrice(ticker, MarketInfoProvider::bid, ask))
-      {
-        bool ok = provider->GetAssetPrice(ticker, MarketInfoProvider::last, ask);
-        assert(ok);
-      }
-      ask += std::max(ask * average, 0.01);
+      ask = bid + std::max(bid * avgRelativeSpread, 0.01);
+      haveAllAsks = false;
     }
   };
 
@@ -230,7 +226,7 @@ int main(int argc, char* argv[])
     }
   );
 
-  o.Optimize(a, f);
+  o.Optimize(a, ratesProvider);
   std::cout << std::string(maxStatusLength, ' ') << std::endl;
 
   struct Result : public Optimizer::Result
@@ -273,8 +269,9 @@ int main(int argc, char* argv[])
     else
     {
       double ask;
-      r.askIsValid = provider->GetAssetPrice(r.ticker, MarketInfoProvider::ask, ask);
-      assert(!r.askIsValid || ask == r.ask);
+      r.askIsValid =
+        provider->GetAssetPrice(r.ticker, MarketInfoProvider::ask, ask) && ask == r.ask;
+      assert(r.askIsValid || !haveAllAsks);
 
       r.iopvIsValid = provider->GetAssetPrice(r.ticker, MarketInfoProvider::iopv, r.iopv);
       if (r.iopvIsValid)
