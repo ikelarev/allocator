@@ -29,7 +29,8 @@ Curl::Curl(const std::string &proxy) : proxy_(proxy)
 {
 }
 
-std::string Curl::HttpGet(const std::string &url) const
+std::string Curl::HttpGet(
+  const std::string &url, const std::vector<std::pair<std::string, std::string>> &headers) const
 {
   std::string buffer;
 
@@ -54,6 +55,14 @@ std::string Curl::HttpGet(const std::string &url) const
     code = curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
     assert(code == CURLE_OK);
 
+    struct curl_slist *h = nullptr;
+    if (!headers.empty())
+    {
+      for (const auto &p : headers)
+        h = curl_slist_append(h, (p.first + ": " + p.second).c_str());
+      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, h);
+    }
+
     code = curl_easy_perform(curl);
     if (code != CURLE_OK)
     {
@@ -62,6 +71,9 @@ std::string Curl::HttpGet(const std::string &url) const
       // TODO: that's not good to print anything here - error handling mechanism is required
       fprintf(stderr, "curl_easy_perform() failed: %s (%d)\n", curl_easy_strerror(code), code);
     }
+
+    if (h)
+      curl_slist_free_all(h);
 
     curl_easy_cleanup(curl);
   }

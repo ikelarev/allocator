@@ -23,11 +23,13 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 class InternetProvider
 {
 public:
   virtual ~InternetProvider() { }
 
-  virtual std::string HttpGet(const std::string &url) const = 0;
+  virtual std::string HttpGet(
+    const std::string &url, const std::vector<std::pair<std::string, std::string>> &headers = { }) const = 0;
 };

@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include "alphavantage.h"
 #include "curl.h"
-#include "iextrading.h"
 #include "optimizer.h"
 #include "tableformatter.h"
 #include "yahoofinance.h"
@@ -102,20 +102,22 @@ int main(int argc, char* argv[])
     tickers[i] = a.GetTicker(i);
   }
 
+
   const std::string &pname = a.GetProviderName();
+  if (a.GetProviderToken().empty())
+  {
+    std::cout << "Error: API Token was not specified (required for " << pname << ")" << std::endl;
+    return 1;
+  }
+
   std::unique_ptr<MarketInfoProvider> provider;
   if (pname == "YAHOO FINANCE")
   {
-    provider = std::make_unique<YahooFinance>();
+    provider = std::make_unique<YahooFinance>(a.GetProviderToken());
   }
-  else if (pname == "IEX TRADING")
+  else if (pname == "ALPHA VANTAGE")
   {
-    if (a.GetProviderToken().empty())
-    {
-      std::cout << "Error: API Token was not specified (required for IEX TRADING)" << std::endl;
-      return 1;
-    }
-    provider = std::make_unique<IexTrading>(a.GetProviderToken());
+    provider = std::make_unique<AlphaVantage>(a.GetProviderToken());
   }
   else
   {

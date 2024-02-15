@@ -25,13 +25,11 @@
 #include "market_info_provider.h"
 
 #include <map>
-#include <string>
-#include <vector>
 
-class IexTrading : public MarketInfoProvider
+class AlphaVantage : public MarketInfoProvider
 {
 public:
-  IexTrading(const std::string &token);
+  AlphaVantage(const std::string &apikey);
 
   void RetrieveAssetsInfo(const Tickers &t, const InternetProvider &prov) override;
 
@@ -39,28 +37,14 @@ public:
   bool GetAssetPrice(const std::string &ticker, PriceType type, double &price) const override;
 
 private:
-  using StringMap = std::map<std::string, std::string>;
-  StringMap Download(const std::string &url, const InternetProvider &prov);
-
-  static bool ParsePrice(const std::string &s, double &price);
-  static std::vector<std::string> Split(const std::string &str);
-
-private:
   struct AssetInfo
   {
     std::string name;
-
     double price;
-    double bid;
-    double ask;
-
-    bool hasPrice = false;
-    bool hasBid   = false;
-    bool hasAsk   = false;
   };
 
   using AssetInfoMap = std::map<std::string, AssetInfo>;
   AssetInfoMap assets_;
 
-  std::string token_;
+  std::string apikey_;
 };

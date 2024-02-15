@@ -28,12 +28,14 @@ using json = nlohmann::json;
 
 struct YahooFinance::Impl
 {
+  std::string apikey;
   std::map<std::string, json> data;
 };
 
-YahooFinance::YahooFinance()
+YahooFinance::YahooFinance(const std::string &apikey)
 {
   impl_ = std::make_unique<Impl>();
+  impl_->apikey = apikey;
 }
 
 YahooFinance::~YahooFinance()
@@ -46,16 +48,20 @@ void YahooFinance::RetrieveAssetsInfo(const Tickers &t, const InternetProvider &
   impl_->data.clear();
 
   std::string url =
-    "http://query1.finance.yahoo.com/v7/finance/quote?"
-    "lang=en-US&region=US&corsDomain=finance.yahoo.com&symbols=";
+    "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?region=US&symbols=";
 
   for (size_t i = 0; i < t.size(); i++)
   {
-    if (i > 0) url += ',';
+    if (i > 0)
+      url += ',';
     url += t[i] + "," + GetIopvTicker(t[i]);
   }
 
-  std::string resp = prov.HttpGet(url);
+  std::string resp = prov.HttpGet(url,
+    {
+      { "X-RapidAPI-Host", "apidojo-yahoo-finance-v1.p.rapidapi.com" },
+      { "X-RapidAPI-Key", impl_->apikey },
+    });
 
   try
   {
@@ -74,7 +80,7 @@ void YahooFinance::RetrieveAssetsInfo(const Tickers &t, const InternetProvider &
       }
     }
   }
-  catch (json::exception &ex)
+  catch (json::exception &)
   {
   }
 }

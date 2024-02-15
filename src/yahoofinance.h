@@ -29,7 +29,7 @@
 class YahooFinance : public MarketInfoProvider
 {
 public:
-  YahooFinance();
+  YahooFinance(const std::string &apikey);
   ~YahooFinance();
 
   void RetrieveAssetsInfo(const Tickers &t, const InternetProvider &prov) override;

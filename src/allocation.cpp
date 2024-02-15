@@ -321,7 +321,7 @@ bool Allocation::LoadHandler(LoadContext &ctx, std::string section, std::string 
     {
       providerName_ = value;
     }
-    else if (name == "API TOKEN" || name == "TOKEN")
+    else if (name == "API TOKEN" || name == "TOKEN" || name == "API KEY" || name == "APIKEY")
     {
       providerToken_ = sourceValue;
     }

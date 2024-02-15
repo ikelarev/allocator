@@ -143,11 +143,13 @@ Optimizer Optimize(const Allocation &a, bool expected = true, bool checkq = true
   (
     [](size_t iter, int nodes, double progress) -> bool
     {
+#ifdef _DEBUG
       std::cout << iter << ", " << nodes << ", " << int(progress * 100) << "%  ";
       if (progress == 1)
         std::cout << std::endl;
       else
         std::cout << "\r";
+#endif
       return true;
     }
   );

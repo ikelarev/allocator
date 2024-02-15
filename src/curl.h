@@ -28,7 +28,8 @@ class Curl : public InternetProvider
 {
 public:
   Curl(const std::string &proxy = std::string());
-  std::string HttpGet(const std::string &url) const override;
+  std::string HttpGet(
+    const std::string &url, const std::vector<std::pair<std::string, std::string>> &headers) const override;
 
 private:
   static size_t AppendBuffer(char *data, size_t size, size_t count, std::string *buffer);

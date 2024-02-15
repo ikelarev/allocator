@@ -28,10 +28,11 @@
 class TestProvider : public InternetProvider
 {
 private:
-  std::string HttpGet(const std::string &url) const override
+  std::string HttpGet(
+    const std::string &url, const std::vector<std::pair<std::string, std::string>> &headers) const override
   {
-    const char prefix[] = "http://query1.finance.yahoo.com/v7/finance/quote?"
-      "lang=en-US&region=US&corsDomain=finance.yahoo.com&symbols=";
+    const char prefix[] =
+      "https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/v2/get-quotes?region=US&symbols=";
     REQUIRE(url.find(prefix) == 0);
 
     std::string request = url.substr(sizeof(prefix) - 1);
@@ -169,7 +170,7 @@ private:
 
 TEST_CASE("SimpleTest", "[yahoofinance]")
 {
-  YahooFinance yf;
+  YahooFinance yf("APIKEY");
   yf.RetrieveAssetsInfo({ "TLT" }, TestProvider());
 
   std::string name;
@@ -209,7 +210,7 @@ TEST_CASE("SimpleTest", "[yahoofinance]")
 
 TEST_CASE("SecondTest", "[yahoofinance]")
 {
-  YahooFinance yf;
+  YahooFinance yf("APIKEY");
   yf.RetrieveAssetsInfo({ "TLT", "VTI", "GOOG", "O" }, TestProvider());
 
   bool ok;
@@ -277,7 +278,7 @@ TEST_CASE("SecondTest", "[yahoofinance]")
 
 TEST_CASE("IncompleteTest", "[yahoofinance]")
 {
-  YahooFinance yf;
+  YahooFinance yf("APIKEY");
   yf.RetrieveAssetsInfo({ "SPY", "BND" }, TestProvider());
 
   bool ok;
@@ -308,7 +309,7 @@ TEST_CASE("IncompleteTest", "[yahoofinance]")
 
 TEST_CASE("InvalidResponseTest", "[yahoofinance]")
 {
-  YahooFinance yf;
+  YahooFinance yf("APIKEY");
   yf.RetrieveAssetsInfo({ "TSLA" }, TestProvider());
 
   bool ok;
@@ -327,7 +328,7 @@ TEST_CASE("InvalidResponseTest", "[yahoofinance]")
 
 TEST_CASE("NATest", "[yahoofinance]")
 {
-  YahooFinance yf;
+  YahooFinance yf("APIKEY");
   yf.RetrieveAssetsInfo({ "NA1", "NA2" }, TestProvider());
 
   std::string name;
@@ -342,7 +343,7 @@ TEST_CASE("NATest", "[yahoofinance]")
 
 TEST_CASE("YFCurlTest", "[yahoofinance]")
 {
-  YahooFinance yf;
+  YahooFinance yf("12fd58682fmsh893aa1c5a80b513p12eadajsn4712484e61f3");
   yf.RetrieveAssetsInfo({ "GLD" }, Curl());
 
   std::string name;

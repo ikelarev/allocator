@@ -116,8 +116,8 @@ set(OPTIMIZER_SOURCES
 )
 
 set(ALLOCATOR_HEADERS
+  ${SRC_DIR}/alphavantage.h
   ${SRC_DIR}/curl.h
-  ${SRC_DIR}/iextrading.h
   ${SRC_DIR}/internet_provider.h
   ${SRC_DIR}/market_info_provider.h
   ${SRC_DIR}/yahoofinance.h
@@ -125,8 +125,8 @@ set(ALLOCATOR_HEADERS
 )
 
 set(ALLOCATOR_SOURCES
+  ${SRC_DIR}/alphavantage.cpp
   ${SRC_DIR}/curl.cpp
-  ${SRC_DIR}/iextrading.cpp
   ${SRC_DIR}/yahoofinance.cpp
 )
 
@@ -138,7 +138,6 @@ set(TESTS_SOURCES
   ${SRC_DIR}/tests.cpp
   ${SRC_DIR}/test_allocation.cpp
   ${SRC_DIR}/test_glpk.cpp
-  ${SRC_DIR}/test_iextrading.cpp
   ${SRC_DIR}/test_mipsolver.cpp
   ${SRC_DIR}/test_optimizer.cpp
   ${SRC_DIR}/test_tableformatter.cpp
